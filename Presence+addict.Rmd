@@ -1,0 +1,158 @@
+---
+title: "PresenceNetwork"
+author: "Taylor"
+date: "2022-10-03"
+output: html_document
+---
+##First analysis: Presence 
+
+#Step 1: install and run packages 
+
+```{r echo=FALSE, warning=FALSE, error=FALSE}
+library(bootnet)
+library(networktools)
+library(NetworkComparisonTest)
+library(qgraph)
+library(psych)
+library(psychotools)
+library(tidyverse)
+library(semTools)
+library(semPlot)
+library(haven)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Step 2: import and define dataset
+```{r}
+dataset <- read_sav("1st_wave_collated.sav")
+View(dataset)
+myvars <- c("spatial_presence", "Ig_involvement", "Ig_realism", "PEQ", "UAQ_Identification", "UAQ_immersion", "UAQ_compensation")
+
+netdata<-dataset[myvars]
+
+describe(netdata)
+
+```
+
+#Step 3: Estimate Network
+```{r}
+
+network1 <- estimateNetwork(netdata, default="EBICglasso")
+
+```
+
+#Step 4: Estimate network stability by bootstrapping network
+
+#B1 = default bootstrapping 
+#B2 = case dropping bootstrapping 
+
+```{r echo=FALSE, warning=FALSE, error=FALSE, message=FALSE, results='FALSE'}
+b1 <- bootnet(network1, boots=1000, statistics=c("strength", "expectedInfluence", "edge"))
+
+b2 <- bootnet(network1, boots=1000, type="case", statistics=c("strength", "expectedInfluence", "edge"))
+
+
+```
+
+#Step 5: Plot the Network
+```{r echo=FALSE, error=FALSE, warning=FALSE}
+
+plot(network1, layout="spring", vsize=6, border.color="black", color=c('lightblue','orange', 'red'))
+
+```
+
+#Step 6: Get Centrality Indices
+```{r}
+Centrality1 <-centralityTable(network1)
+write.csv(Centrality1)
+view(Centrality1)
+
+```
+
+
+#Step 7: Get centrality stability coefficient
+```{r echo=FALSE, error=FALSE, warning=FALSE}
+corStability(b2)
+
+```
+
+#Step 8: Stability of the Network Plotting
+```{r}
+pdf("CentrStability1.pdf")
+plot(b2)
+dev.off()
+```
+
+```{r}
+pdf("edges.pdf")
+plot(b1, "edge", plot="difference", onlyNonZero=TRUE, order = "sample")
+```
+
+##2nd Network analysis introducing IGD as assessed by the IGD9-SF
+
+#Repeat step 2 = import and define dataset
+```{r}
+dataset <- read_sav("1st_wave_collated.sav")
+View(dataset)
+myvars2 <- c("IGD9_SF", "spatial_presence", "Ig_involvement", "Ig_realism", "PEQ", "UAQ_Identification", "UAQ_immersion", "UAQ_compensation")
+
+netdata2<-dataset[myvars2]
+
+describe(netdata2)
+
+```
+
+#Repeat step 3 = Estimate Network
+```{r}
+
+network2 <- estimateNetwork(netdata2, default="EBICglasso")
+
+```
+
+#Repeat step 4 = Estimate network stability by bootstrapping network
+
+B1 = default bootstrapping 
+B2 = case dropping bootstrapping 
+
+```{r echo=FALSE, warning=FALSE, error=FALSE, message=FALSE, results='FALSE'}
+b1b <- bootnet(network2, boots=1000, statistics=c("strength", "expectedInfluence", "edge"))
+
+b2b <- bootnet(network2, boots=1000, type="case", statistics=c("strength", "expectedInfluence", "edge"))
+
+
+```
+
+#Repeat step 5 = Plot the Network
+```{r echo=FALSE, error=FALSE, warning=FALSE}
+
+plot(network2, layout="spring", vsize=6, border.color="black", color=c('lightblue','orange', 'red'))
+
+```
+
+#Repeat step 6 = Get Centrality Indices
+```{r}
+Centrality2 <-centralityTable(network2)
+write.csv(Centrality2)
+view(Centrality2)
+
+```
+
+
+#Repeat step 7 = Get centrality stability coefficient
+```{r echo=FALSE, error=FALSE, warning=FALSE}
+corStability(b2b)
+
+```
+
+#Repeat step 8 = Stability of the Network Plotting
+```{r}
+pdf("CentrStability1.pdf")
+plot(b2)
+dev.off()
+```
+
+```{r}
+pdf("edges.pdf")
+plot(b1, "edge", plot="difference", onlyNonZero=TRUE, order = "sample")
+```
