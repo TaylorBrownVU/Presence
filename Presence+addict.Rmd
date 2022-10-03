@@ -71,6 +71,7 @@ view(Centrality1)
 ```
 
 
+
 #Step 7: Get centrality stability coefficient
 ```{r echo=FALSE, error=FALSE, warning=FALSE}
 corStability(b2)
